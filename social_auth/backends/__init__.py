@@ -291,10 +291,13 @@ class OpenIDBackend(SocialAuthBackend):
             except ValueError:
                 last_name = fullname
 
-        values.update({'fullname': fullname, 'first_name': first_name,
-                       'last_name': last_name,
-                       USERNAME: values.get(USERNAME) or
-                                   (first_name.title() + last_name.title())})
+        values.update({
+            'fullname': fullname,
+            'first_name': first_name,
+            'last_name': last_name,
+            USERNAME: values.get(USERNAME) or
+                      (first_name.title() + last_name.title())
+        })
         return values
 
     def extra_data(self, user, uid, response, details):
@@ -656,6 +659,9 @@ class ConsumerBasedOAuth(BaseOAuth):
 
     def do_auth(self, access_token, *args, **kwargs):
         """Finish the auth process once the access_token was retrieved"""
+        if isinstance(access_token, basestring):
+            access_token = Token.from_string(access_token)
+
         data = self.user_data(access_token)
         if data is not None:
             data['access_token'] = access_token.to_string()
